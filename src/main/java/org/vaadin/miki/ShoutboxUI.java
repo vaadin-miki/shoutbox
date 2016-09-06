@@ -4,13 +4,17 @@ import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.server.*;
+import com.vaadin.shared.Position;
+import com.vaadin.ui.*;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -22,24 +26,71 @@ import com.vaadin.ui.VerticalLayout;
 @Theme("mytheme")
 public class ShoutboxUI extends UI {
 
+    private final Properties properties = new Properties();
+    private final VerticalLayout layout = new VerticalLayout();
+
+    private boolean loadProperties(String filename) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) {
+            this.properties.load(inputStream);
+            return true;
+        } catch (IOException | NullPointerException e) {
+            return false;
+        }
+    }
+
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        final VerticalLayout layout = new VerticalLayout();
+        // list of seven dirty words by George Carlin
+        if(!this.loadProperties("words.properties"))
+            System.err.println("Word filter not loaded.");
 
         final TextField text = new TextField();
         text.setCaption("You were saying?");
         text.setInputPrompt("(type something)");
 
         Button button = new Button("Shout");
-        button.addClickListener( e ->
-            layout.addComponent(new Label(text.getValue()))
-        );
-        
+
+        button.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+
+        button.addClickListener( e -> {
+                if(text.getValue().isEmpty())
+                        onEmptyTextSubmitted();
+                else {
+                    onTextSubmitted(text.getValue());
+                    text.clear();
+                }
+        });
+
         layout.addComponents(text, button);
         layout.setMargin(true);
         layout.setSpacing(true);
         
         setContent(layout);
+    }
+
+    private void onTextSubmitted(String text) {
+        List<String> dirty_words = Arrays.asList(this.properties.getProperty("filter", "").split("\\s*,\\s*"));
+        String[] text_words = text.split("\\s+");
+        StringBuilder result = new StringBuilder();
+        for(String word: text_words) {
+            if (dirty_words.contains(word.toLowerCase()))
+                result.append(" *#@!&");
+            else result.append(" " + word);
+        }
+        this.layout.addComponent(new Label(result.substring(1)));
+    }
+
+    private void onEmptyTextSubmitted() {
+        Notification notification = new Notification(
+                "You said it best, but you said nothing at all",
+                Notification.Type.ERROR_MESSAGE
+        );
+        notification.setDescription("You have to enter some text to have it shouted. Please try again.");
+        notification.setPosition(Position.MIDDLE_CENTER);
+        // icon by http://rokey.deviantart.com/art/The-Blacy-11327960
+        // (c) NetEase.com - for non-commercial purposes only
+        notification.setIcon(new ExternalResource("http://findicons.com/files/icons/376/the_blacy/128/nothing_to_say.png"));
+        notification.show(this.getPage());
     }
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
