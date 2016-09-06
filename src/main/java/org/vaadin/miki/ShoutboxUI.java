@@ -53,6 +53,12 @@ public class ShoutboxUI extends UI {
         MESSAGES.addItemSetChangeListener(this::messagesChanged);
     }
 
+    @Override
+    public void close() {
+        MESSAGES.removeItemSetChangeListener(this::messagesChanged);
+        super.close();
+    }
+
     private void messagesChanged(Container.ItemSetChangeEvent event) {
         this.access(new Runnable() {
             @Override
