@@ -2,12 +2,17 @@ package org.vaadin.miki;
 
 import javax.servlet.annotation.WebServlet;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.Container;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.*;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.*;
+import org.vaadin.miki.data.Message;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,10 +29,15 @@ import java.util.Properties;
  * overridden to add component to the user interface and initialize non-component functionality.
  */
 @Theme("mytheme")
+@Push(PushMode.MANUAL)
 public class ShoutboxUI extends UI {
+
+    private static final BeanItemContainer<Message> MESSAGES = new BeanItemContainer<>(Message.class);
 
     private final Properties properties = new Properties();
     private final VerticalLayout layout = new VerticalLayout();
+
+    private int lastMessage = 0;
 
     private boolean loadProperties(String filename) {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) {
@@ -36,6 +46,24 @@ public class ShoutboxUI extends UI {
         } catch (IOException | NullPointerException e) {
             return false;
         }
+    }
+
+    public ShoutboxUI() {
+        super();
+        MESSAGES.addItemSetChangeListener(this::messagesChanged);
+    }
+
+    private void messagesChanged(Container.ItemSetChangeEvent event) {
+        this.access(new Runnable() {
+            @Override
+            public void run() {
+                List<Message> messages = MESSAGES.getItemIds();
+                for(; lastMessage < messages.size(); lastMessage++) {
+                    layout.addComponent(new Label(messages.get(lastMessage).getText()));
+
+                push();
+            }
+        }});
     }
 
     @Override
@@ -77,7 +105,7 @@ public class ShoutboxUI extends UI {
                 result.append(" *#@!&");
             else result.append(" " + word);
         }
-        this.layout.addComponent(new Label(result.substring(1)));
+        MESSAGES.addBean(new Message(result.substring(1)));
     }
 
     private void onEmptyTextSubmitted() {
