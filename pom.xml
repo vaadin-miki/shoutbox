@@ -21,7 +21,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<!-- If there are no local customisations, this can also be "fetch" or "cdn" -->
-		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
+		<vaadin.widgetset.mode>cdn</vaadin.widgetset.mode>
 	</properties>
 
 	<repositories>
@@ -54,6 +54,11 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.vaadin.miki</groupId>
+			<artifactId>flatselect</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -94,9 +99,9 @@
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
 				<version>${vaadin.plugin.version}</version>
-				<configuration>
+				<!-- configuration>
 					<widgetsetMode>cdn</widgetsetMode>
-				</configuration>
+				</configuration -->
 				<executions>
 					<execution>
 						<goals>

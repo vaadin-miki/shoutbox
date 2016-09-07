@@ -12,8 +12,9 @@ import org.vaadin.miki.data.Message;
 public class RoomViewProvider implements ViewProvider {
     private final RoomView view = new RoomView();
 
-    public RoomViewProvider(Container messages) {
+    public RoomViewProvider(Container messages, Container rooms) {
         this.view.setContainerDataSource(messages);
+        this.view.setRoomContainer(rooms);
     }
 
     @Override

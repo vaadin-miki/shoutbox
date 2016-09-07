@@ -7,6 +7,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.*;
@@ -35,10 +36,12 @@ import java.util.Properties;
 public class ShoutboxUI extends UI {
 
     private static final BeanItemContainer<Message> MESSAGES = new BeanItemContainer<>(Message.class);
+
     public static final String FILTER = "*#@!&";
 
     private final Properties properties = new Properties();
     private final Panel placeholder = new Panel();
+    private final IndexedContainer rooms = new IndexedContainer();
 
     private boolean loadProperties(String filename) {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) {
@@ -57,7 +60,9 @@ public class ShoutboxUI extends UI {
 
         placeholder.setSizeFull();
         final Navigator navigator = new Navigator(this, placeholder);
-        navigator.addProvider(new RoomViewProvider(MESSAGES));
+        navigator.addProvider(new RoomViewProvider(MESSAGES, rooms));
+
+        this.rooms.addContainerProperty("name", String.class, "");
     }
 
     @Override
@@ -104,7 +109,11 @@ public class ShoutboxUI extends UI {
         text.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
         text.addStyleName(ValoTheme.TEXTFIELD_LARGE);
 
-        CssLayout main = new CssLayout(top, placeholder);
+        FlatSelect roomSelect = new FlatSelect("Rooms:", this.rooms);
+        roomSelect.setSizeFull();
+        roomSelect.addValueChangeListener(e -> getNavigator().navigateTo(e.getProperty().getValue().toString()));
+
+        CssLayout main = new CssLayout(top, roomSelect, placeholder);
 
         main.addStyleName("messages");
 
