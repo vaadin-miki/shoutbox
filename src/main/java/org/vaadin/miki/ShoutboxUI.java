@@ -35,7 +35,7 @@ public class ShoutboxUI extends UI {
     private static final BeanItemContainer<Message> MESSAGES = new BeanItemContainer<>(Message.class);
 
     private final Properties properties = new Properties();
-    private final VerticalLayout layout = new VerticalLayout();
+    private final FormLayout layout = new FormLayout();
 
     private int lastMessage = 0;
 
@@ -51,6 +51,9 @@ public class ShoutboxUI extends UI {
     public ShoutboxUI() {
         super();
         MESSAGES.addItemSetChangeListener(this::messagesChanged);
+        // list of seven dirty words by George Carlin
+        if(!this.loadProperties("words.properties"))
+            System.err.println("Word filter not loaded.");
     }
 
     @Override
@@ -65,7 +68,7 @@ public class ShoutboxUI extends UI {
             public void run() {
                 List<Message> messages = MESSAGES.getItemIds();
                 for(; lastMessage < messages.size(); lastMessage++) {
-                    layout.addComponent(new Label(messages.get(lastMessage).getText()));
+                    layout.addComponentAsFirst(new Label(messages.get(lastMessage).getText()));
 
                 push();
             }
@@ -74,9 +77,6 @@ public class ShoutboxUI extends UI {
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        // list of seven dirty words by George Carlin
-        if(!this.loadProperties("words.properties"))
-            System.err.println("Word filter not loaded.");
 
         final TextField text = new TextField();
         text.setCaption("You were saying?");
@@ -95,11 +95,22 @@ public class ShoutboxUI extends UI {
                 }
         });
 
-        layout.addComponents(text, button);
+        HorizontalLayout top = new HorizontalLayout(text, button);
+        top.setSpacing(true);
+        top.setExpandRatio(text, 0.7f);
+        top.setExpandRatio(button, 0.2f);
+        text.setSizeFull();
+        button.setSizeFull();
+        top.setWidth("100%");
+
+        CssLayout main = new CssLayout(top, layout);
+        main.setSizeFull();
+        layout.setSizeFull();
+
         layout.setMargin(true);
         layout.setSpacing(true);
         
-        setContent(layout);
+        setContent(main);
     }
 
     private void onTextSubmitted(String text) {
