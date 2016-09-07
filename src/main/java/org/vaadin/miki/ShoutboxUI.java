@@ -96,8 +96,9 @@ public class ShoutboxUI extends UI {
         });
 
         HorizontalLayout top = new HorizontalLayout(text, button);
+        top.setMargin(true);
         top.setSpacing(true);
-        top.setExpandRatio(text, 0.7f);
+        top.setExpandRatio(text, 0.6f);
         top.setExpandRatio(button, 0.2f);
         text.setSizeFull();
         button.setSizeFull();
