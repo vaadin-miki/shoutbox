@@ -38,8 +38,7 @@ public class ShoutboxUI extends UI {
     public static final String FILTER = "*#@!&";
 
     private final Properties properties = new Properties();
-
-    private int lastMessage = 0;
+    private final Panel placeholder = new Panel();
 
     private boolean loadProperties(String filename) {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) {
@@ -52,35 +51,24 @@ public class ShoutboxUI extends UI {
 
     public ShoutboxUI() {
         super();
-        MESSAGES.addItemSetChangeListener(this::messagesChanged);
         // list of seven dirty words by George Carlin
         if(!this.loadProperties("words.properties"))
             System.err.println("Word filter not loaded.");
+
+        placeholder.setSizeFull();
+        final Navigator navigator = new Navigator(this, placeholder);
+        navigator.addProvider(new RoomViewProvider(MESSAGES));
     }
 
     @Override
     public void close() {
-        MESSAGES.removeItemSetChangeListener(this::messagesChanged);
+        if(this.getNavigator().getCurrentView() instanceof Container.Viewer)
+            ((Container.Viewer)this.getNavigator().getCurrentView()).setContainerDataSource(null);
         super.close();
-    }
-
-    private void messagesChanged(Container.ItemSetChangeEvent event) {
-        this.access(() -> {
-            List<Message> messages = MESSAGES.getItemIds();
-            for (; lastMessage < messages.size(); lastMessage++) {
-                if(getNavigator().getCurrentView() instanceof MessageDisplayer)
-                    ((MessageDisplayer)getNavigator().getCurrentView()).displayMessage(messages.get(lastMessage));
-            }
-            push();
-        });
     }
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        final Panel placeholder = new Panel();
-        placeholder.setSizeFull();
-        final Navigator navigator = new Navigator(this, placeholder);
-        navigator.addProvider(new RoomViewProvider());
 
         final TextField text = new TextField();
         text.setCaption("You were saying?");
@@ -123,6 +111,7 @@ public class ShoutboxUI extends UI {
         main.setSizeFull();
 
         setContent(main);
+        text.focus();
     }
 
     private void onTextSubmitted(String text) {

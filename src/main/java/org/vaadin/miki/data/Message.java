@@ -1,5 +1,9 @@
 package org.vaadin.miki.data;
 
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomField;
+import com.vaadin.ui.CustomLayout;
+
 import java.util.Objects;
 
 /**
