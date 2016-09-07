@@ -8,6 +8,7 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.server.*;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.communication.PushMode;
@@ -34,10 +35,9 @@ import java.util.Properties;
 public class ShoutboxUI extends UI {
 
     private static final BeanItemContainer<Message> MESSAGES = new BeanItemContainer<>(Message.class);
-    private static final String FILTER = "*#@!&";
+    public static final String FILTER = "*#@!&";
 
     private final Properties properties = new Properties();
-    private final FormLayout layout = new FormLayout();
 
     private int lastMessage = 0;
 
@@ -65,24 +65,22 @@ public class ShoutboxUI extends UI {
     }
 
     private void messagesChanged(Container.ItemSetChangeEvent event) {
-        this.access(new Runnable() {
-            @Override
-            public void run() {
-                List<Message> messages = MESSAGES.getItemIds();
-                for(; lastMessage < messages.size(); lastMessage++) {
-                    Label label = new Label(messages.get(lastMessage).getText());
-                    if(label.getValue().indexOf(FILTER) != -1)
-                        label.addStyleName("redacted");
-                    label.addStyleName("message");
-                    layout.addComponentAsFirst(label);
-
-                push();
+        this.access(() -> {
+            List<Message> messages = MESSAGES.getItemIds();
+            for (; lastMessage < messages.size(); lastMessage++) {
+                if(getNavigator().getCurrentView() instanceof MessageDisplayer)
+                    ((MessageDisplayer)getNavigator().getCurrentView()).displayMessage(messages.get(lastMessage));
             }
-        }});
+            push();
+        });
     }
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
+        final Panel placeholder = new Panel();
+        placeholder.setSizeFull();
+        final Navigator navigator = new Navigator(this, placeholder);
+        navigator.addProvider(new RoomViewProvider());
 
         final TextField text = new TextField();
         text.setCaption("You were saying?");
@@ -118,16 +116,12 @@ public class ShoutboxUI extends UI {
         text.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
         text.addStyleName(ValoTheme.TEXTFIELD_LARGE);
 
-        CssLayout main = new CssLayout(top, layout);
+        CssLayout main = new CssLayout(top, placeholder);
 
         main.addStyleName("messages");
 
         main.setSizeFull();
-        layout.setSizeFull();
 
-        layout.setMargin(true);
-        layout.setSpacing(true);
-        
         setContent(main);
     }
 
@@ -140,7 +134,11 @@ public class ShoutboxUI extends UI {
                 result.append(" "+FILTER);
             else result.append(" " + word);
         }
-        MESSAGES.addBean(new Message(result.substring(1)));
+        Message message = new Message(result.substring(1));
+        if(this.getNavigator().getCurrentView() instanceof MessageDisplayer)
+            message.setRoom(((MessageDisplayer) this.getNavigator().getCurrentView()).getRoomName());
+
+        MESSAGES.addBean(message);
     }
 
     private void onEmptyTextSubmitted() {

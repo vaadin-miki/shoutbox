@@ -29,10 +29,16 @@
 // For more information, see: https://vaadin.com/book/-/page/themes.valo.html
 // Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
 
+//noinspection CssUnknownTarget
 @import "../valo/valo.scss";
 
 @mixin mytheme {
   @include valo;
+
+  .v-caption-message {
+    color: #e0e0e0;
+    font-style: italic;
+  }
 
   .messages .redacted {
     color: silver;
