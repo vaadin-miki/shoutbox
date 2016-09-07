@@ -34,5 +34,12 @@
 @mixin mytheme {
   @include valo;
 
+  .messages .redacted {
+    color: silver;
+  }
+
+  .messages .message {
+    font-family: Verdana;
+  }
   // Insert your own theme rules here
 }

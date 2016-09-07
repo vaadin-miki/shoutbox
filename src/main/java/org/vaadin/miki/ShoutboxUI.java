@@ -12,6 +12,7 @@ import com.vaadin.server.*;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import org.vaadin.miki.data.Message;
 
 import java.io.FileNotFoundException;
@@ -33,6 +34,7 @@ import java.util.Properties;
 public class ShoutboxUI extends UI {
 
     private static final BeanItemContainer<Message> MESSAGES = new BeanItemContainer<>(Message.class);
+    private static final String FILTER = "*#@!&";
 
     private final Properties properties = new Properties();
     private final FormLayout layout = new FormLayout();
@@ -68,7 +70,11 @@ public class ShoutboxUI extends UI {
             public void run() {
                 List<Message> messages = MESSAGES.getItemIds();
                 for(; lastMessage < messages.size(); lastMessage++) {
-                    layout.addComponentAsFirst(new Label(messages.get(lastMessage).getText()));
+                    Label label = new Label(messages.get(lastMessage).getText());
+                    if(label.getValue().indexOf(FILTER) != -1)
+                        label.addStyleName("redacted");
+                    label.addStyleName("message");
+                    layout.addComponentAsFirst(label);
 
                 push();
             }
@@ -104,7 +110,18 @@ public class ShoutboxUI extends UI {
         button.setSizeFull();
         top.setWidth("100%");
 
+        button.addStyleName(ValoTheme.BUTTON_LARGE);
+        button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+
+        top.addStyleName(ValoTheme.LAYOUT_CARD);
+
+        text.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
+        text.addStyleName(ValoTheme.TEXTFIELD_LARGE);
+
         CssLayout main = new CssLayout(top, layout);
+
+        main.addStyleName("messages");
+
         main.setSizeFull();
         layout.setSizeFull();
 
@@ -120,7 +137,7 @@ public class ShoutboxUI extends UI {
         StringBuilder result = new StringBuilder();
         for(String word: text_words) {
             if (dirty_words.contains(word.toLowerCase()))
-                result.append(" *#@!&");
+                result.append(" "+FILTER);
             else result.append(" " + word);
         }
         MESSAGES.addBean(new Message(result.substring(1)));
@@ -133,6 +150,7 @@ public class ShoutboxUI extends UI {
         );
         notification.setDescription("You have to enter some text to have it shouted. Please try again.");
         notification.setPosition(Position.MIDDLE_CENTER);
+        notification.setStyleName(ValoTheme.NOTIFICATION_BAR);
         // icon by http://rokey.deviantart.com/art/The-Blacy-11327960
         // (c) NetEase.com - for non-commercial purposes only
         notification.setIcon(new ExternalResource("http://findicons.com/files/icons/376/the_blacy/128/nothing_to_say.png"));
