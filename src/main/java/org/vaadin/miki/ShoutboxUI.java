@@ -16,6 +16,7 @@ import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.vaadin.miki.data.Message;
+import org.vaadin.miki.flatselect.FlatSelect;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -103,18 +104,24 @@ public class ShoutboxUI extends UI {
 
         button.addStyleName(ValoTheme.BUTTON_LARGE);
         button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        button.addStyleName("shout-button");
 
         top.addStyleName(ValoTheme.LAYOUT_CARD);
+        top.addStyleName("entry-bar");
 
         text.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
         text.addStyleName(ValoTheme.TEXTFIELD_LARGE);
+        text.addStyleName("shout-text");
 
         FlatSelect roomSelect = new FlatSelect("Rooms:", this.rooms);
-        roomSelect.setSizeFull();
+        roomSelect.setWidth(100, Unit.PERCENTAGE);
+        roomSelect.setHeightUndefined();
         roomSelect.addValueChangeListener(e -> getNavigator().navigateTo(e.getProperty().getValue().toString()));
 
         CssLayout main = new CssLayout(top, roomSelect, placeholder);
+        Responsive.makeResponsive(main);
 
+        placeholder.addStyleName("viewport");
         main.addStyleName("messages");
 
         main.setSizeFull();

@@ -14,14 +14,14 @@
 	</prerequisites>
 
 	<properties>
-		<vaadin.version>7.7.0</vaadin.version>
+		<vaadin.version>7.7.3</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<!-- If there are no local customisations, this can also be "fetch" or "cdn" -->
-		<vaadin.widgetset.mode>cdn</vaadin.widgetset.mode>
+		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
 	</properties>
 
 	<repositories>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.vaadin.miki</groupId>
 			<artifactId>flatselect</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -106,8 +106,8 @@
 					<execution>
 						<goals>
 							<goal>update-theme</goal>
-							<!-- goal>update-widgetset</goal>
-							<goal>compile</goal -->
+							<goal>update-widgetset</goal>
+							<goal>compile</goal>
 							<!-- Comment out compile-theme goal to use on-the-fly theme compilation -->
 							<goal>compile-theme</goal>
 						</goals>
