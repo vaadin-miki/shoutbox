@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.vaadin.miki</groupId>
 			<artifactId>flatselect</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -99,9 +99,6 @@
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
 				<version>${vaadin.plugin.version}</version>
-				<!-- configuration>
-					<widgetsetMode>cdn</widgetsetMode>
-				</configuration -->
 				<executions>
 					<execution>
 						<goals>
