@@ -117,8 +117,10 @@ public class ShoutboxUI extends UI {
         roomSelect.setWidth(100, Unit.PERCENTAGE);
         roomSelect.setHeightUndefined();
         roomSelect.addValueChangeListener(e -> getNavigator().navigateTo(e.getProperty().getValue().toString()));
+        roomSelect.addStyleName("rooms");
 
         CssLayout main = new CssLayout(top, roomSelect, placeholder);
+        main.addStyleName("shoutbox");
         Responsive.makeResponsive(main);
 
         placeholder.addStyleName("viewport");

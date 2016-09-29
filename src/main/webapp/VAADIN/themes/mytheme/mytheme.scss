@@ -47,5 +47,20 @@
   .messages .message {
     font-family: Verdana;
   }
-  // Insert your own theme rules here
+
+  .shoutbox[width-range~="0-1100px"] {
+    .entry-bar {
+      position: absolute;
+      bottom: 0;
+    }
+
+    .rooms, .v-caption-rooms, .v-caption-shout-text {
+      display: none;
+    }
+  }
+
+  .shoutbox[width-range~="1100px-"] {
+
+  }
+
 }
