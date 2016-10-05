@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+ <head>  
+  <meta charset="UTF-8" name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;THEME&quot;:&quot;valo&quot;}">
+  <meta charset="UTF-8" name="vaadin-version" content="7.7.0">
+  <meta charset="UTF-8" name="package-mapping" content="org_vaadin_miki_flatselect:org.vaadin.miki.flatselect">
+ </head> 
+ <body> 
+  <vaadin-css-layout style-name="messages shoutbox" size-full>
+   <vaadin-horizontal-layout style-name="card entry-bar" spacing width-full margin _id="top"> 
+    <vaadin-text-field caption="You were saying?" input-prompt="(type something)" style-name="large borderless" width-full _id="text" :expand="0.6"></vaadin-text-field> 
+    <vaadin-button style-name="large friendly shout-button" immediate width-full plain-text _id="button" :middle :center :expand="0.2">
+      Shout! 
+    </vaadin-button> 
+   </vaadin-horizontal-layout> 
+   <org_vaadin_miki_flatselect-flat-select caption="Rooms:" style-name="rooms" width-full _id="roomSelect"></org_vaadin_miki_flatselect-flat-select> 
+   <vaadin-panel style-name="viewport" size-full _id="placeholder"></vaadin-panel> 
+  </vaadin-css-layout>  
+ </body>
+</html>
